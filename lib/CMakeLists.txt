@@ -8,9 +8,9 @@ file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/include/*.hpp")
 
 find_package(OpenGL REQUIRED)
 
-target_link_libraries(core PUBLIC glad OpenGL::GL glm)
+target_link_libraries(core PUBLIC glad OpenGL::GL glm glfw)
 
 target_sources(core
 	PRIVATE
-	test.cpp
+	Window.cpp
 )
