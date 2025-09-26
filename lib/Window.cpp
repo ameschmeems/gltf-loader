@@ -1,5 +1,5 @@
 #include "Window.hpp"
-#include <iostream>
+#include "spdlog/spdlog.h"
 
 /**
  * @brief Constructor for Window from existing GLFWwindow pointer
@@ -28,6 +28,7 @@ Window::Window(const int width, const int height, const std::string title, GLFWm
 	{
 		throw CreateWindowFailedException();
 	}
+	spdlog::debug("Created new window: width={}, height={}, title={}", width, height, title);
 }
 
 /**

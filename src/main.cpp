@@ -3,9 +3,14 @@
 #include <iostream>
 #include <memory>
 #include "Window.hpp"
+#include "spdlog/spdlog.h"
+
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
+	spdlog::debug("Window resized: width={}, height={}", width, height);
 	glViewport(0, 0, width, height);
 }
 
@@ -16,23 +21,32 @@ void processInput(Window &window)
 }
 
 int main() {
+
+	#ifdef DEBUG
+	spdlog::set_level(spdlog::level::debug);
+	#endif
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+	spdlog::debug("Initialized glfw");
+
 	try {
-		Window window { 800, 600, "glfw-loader", NULL, NULL };
+		Window window { WINDOW_WIDTH, WINDOW_HEIGHT, "gltf-loader", NULL, NULL };
 
 		window.makeContextCurrent();
 
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
-			std::cerr << "Failed to initialize GLAD" << std::endl;
+			spdlog::critical("Failed to initialize GLAD");
 			exit(-1);
 		}
 
-		glViewport(0, 0, 800, 600);
+		spdlog::debug("Initialized glad");
+
+		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 		window.setFramebufferSizeCallback(framebufferSizeCallback);
 
@@ -55,7 +69,7 @@ int main() {
 	}
 	catch (Window::CreateWindowFailedException e)
 	{
-		std::cerr << e.what() << std::endl;
+		spdlog::critical(e.what());
 		exit(-1);
 	}
 }
