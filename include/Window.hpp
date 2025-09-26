@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <memory>
 #include <string>
+#include <stdexcept>
 
 /**
  * @class Window Window.hpp "include/Window.hpp"
@@ -22,7 +23,19 @@ public:
 	Window &operator=(Window &rhs) = delete;
 	Window &operator=(Window &&rhs);
 
-	GLFWwindow *getWindowPtr() const;
+	GLFWwindow *getWindowPtr();
+	void makeContextCurrent();
+	GLFWframebuffersizefun setFramebufferSizeCallback(GLFWframebuffersizefun callback);
+	bool shouldClose();
+	void setWindowShouldClose(bool value);
+	int getKey(int key);
+	void swapBuffers();
+
+	class CreateWindowFailedException : public std::exception
+	{
+	public:
+		const char *what() const throw();
+	};
 
 private:
 

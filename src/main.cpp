@@ -9,10 +9,10 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window)
+void processInput(Window &window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
+	if (window.getKey(GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		window.setWindowShouldClose(true);
 }
 
 int main() {
@@ -21,34 +21,41 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	Window window { 800, 600, "glfw-loader", NULL, NULL };
+	try {
+		Window window { 800, 600, "glfw-loader", NULL, NULL };
 
-	glfwMakeContextCurrent(window.getWindowPtr());
+		window.makeContextCurrent();
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cerr << "Failed to initialize GLAD" << std::endl;
-		return -1;
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+		{
+			std::cerr << "Failed to initialize GLAD" << std::endl;
+			exit(-1);
+		}
+
+		glViewport(0, 0, 800, 600);
+
+		window.setFramebufferSizeCallback(framebufferSizeCallback);
+
+		while (!window.shouldClose())
+		{
+			// input
+			processInput(window);
+
+			// rendering
+			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			// check and call events and swap buffers
+			window.swapBuffers();
+			glfwPollEvents();
+		}
+
+		glfwTerminate();
+		return 0;
 	}
-
-	glViewport(0, 0, 800, 600);
-
-	glfwSetFramebufferSizeCallback(window.getWindowPtr(), framebufferSizeCallback);
-
-	while (!glfwWindowShouldClose(window.getWindowPtr()))
+	catch (Window::CreateWindowFailedException e)
 	{
-		// input
-		processInput(window.getWindowPtr());
-
-		// rendering
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		// check and call events and swap buffers
-		glfwSwapBuffers(window.getWindowPtr());
-		glfwPollEvents();
+		std::cerr << e.what() << std::endl;
+		exit(-1);
 	}
-
-	glfwTerminate();
-	return 0;
 }
