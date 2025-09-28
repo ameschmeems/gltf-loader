@@ -26,6 +26,7 @@ public:
 	GLFWwindow *getWindowPtr();
 	void makeContextCurrent();
 	GLFWframebuffersizefun setFramebufferSizeCallback(GLFWframebuffersizefun callback);
+	GLFWkeyfun setKeyCallback(GLFWkeyfun callback);
 	bool shouldClose();
 	void setWindowShouldClose(bool value);
 	int getKey(int key);

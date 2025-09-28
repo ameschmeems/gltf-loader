@@ -16,19 +16,26 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void processInput(Window &window)
+void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-	if (window.getKey(GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		window.setWindowShouldClose(true);
-	// if (window.getKey(GLFW_KEY_Q) == GLFW_PRESS)
-	// {
-	// 	GLint polygonMode[2] {};
-	// 	glGetIntegerv(GL_POLYGON_MODE, polygonMode);
-	// 	if (polygonMode[0] == GL_FILL)
-	// 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	// 	else
-	// 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	// }
+	switch (key)
+	{
+		case GLFW_KEY_ESCAPE:
+			if (action == GLFW_PRESS)
+				glfwSetWindowShouldClose(window, true);
+			break;
+		case GLFW_KEY_Q:
+			if (action == GLFW_PRESS)
+			{
+				GLint polygonMode[2] {};
+				glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+				if (polygonMode[0] == GL_FILL)
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				else
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+			break;
+	}	
 }
 
 int main() {
@@ -60,6 +67,7 @@ int main() {
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 		window.setFramebufferSizeCallback(framebufferSizeCallback);
+		window.setKeyCallback(keyCallback);
 
 		std::ifstream is { "res/shaders/triangle.vert" };
 		std::stringstream ss {};
@@ -158,9 +166,6 @@ int main() {
 
 		while (!window.shouldClose())
 		{
-			// input
-			processInput(window);
-
 			// rendering
 			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);

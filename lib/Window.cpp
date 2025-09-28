@@ -79,6 +79,18 @@ GLFWframebuffersizefun Window::setFramebufferSizeCallback(GLFWframebuffersizefun
 }
 
 /**
+ * @brief Sets key callback for window using glfwSetKeyCallback
+ * 
+ * @param callback Function pointer to desired callback method
+ * 
+ * @returns The previously set callback, or NULL if not callback was set or glfw had not been initialized.
+ */
+GLFWkeyfun Window::setKeyCallback(GLFWkeyfun callback)
+{
+	return glfwSetKeyCallback(_window.get(), callback);
+}
+
+/**
  * @brief Checks the close flag of the window
  * 
  * @returns true if window should close, otherwise false
