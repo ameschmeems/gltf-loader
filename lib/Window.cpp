@@ -1,5 +1,5 @@
 #include "Window.hpp"
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 /**
  * @brief Constructor for Window from existing GLFWwindow pointer

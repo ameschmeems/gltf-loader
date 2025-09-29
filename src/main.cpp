@@ -4,8 +4,9 @@
 #include <memory>
 #include <fstream>
 #include <sstream>
+#include <spdlog/spdlog.h>
 #include "Window.hpp"
-#include "spdlog/spdlog.h"
+#include "Shader.hpp"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -69,75 +70,16 @@ int main() {
 		window.setFramebufferSizeCallback(framebufferSizeCallback);
 		window.setKeyCallback(keyCallback);
 
-		std::ifstream is { "res/shaders/triangle.vert" };
-		std::stringstream ss {};
-		ss << is.rdbuf();
-		std::string vertShaderStr { ss.str() };
-		const char *vertShaderSource { vertShaderStr.c_str() };
-		is.close();
-		ss.str(std::string());
-		
-		GLuint vertShader { glCreateShader(GL_VERTEX_SHADER) };
-		glShaderSource(vertShader, 1, &vertShaderSource, nullptr);
-		glCompileShader(vertShader);
-
-		GLint success {};
-		char infoLog[512] {};
-		glGetShaderiv(vertShader, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
-			glGetShaderInfoLog(vertShader, 512, nullptr, infoLog);
-			spdlog::critical("Vertex Shader compilation failed: {}", infoLog);
-			exit(-1);
-		}
-		spdlog::debug("Compiled Vertex Shader");
-
-		is.open("res/shaders/triangle.frag");
-		ss << is.rdbuf();
-		std::string fragShaderStr { ss.str() };
-		const char *fragShaderSource { fragShaderStr.c_str() };
-		is.close();
-		ss.str(std::string());
-		
-		GLuint fragShader { glCreateShader(GL_FRAGMENT_SHADER) };
-		glShaderSource(fragShader, 1, &fragShaderSource, nullptr);
-		glCompileShader(fragShader);
-
-		glGetShaderiv(fragShader, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
-			glGetShaderInfoLog(fragShader, 512, nullptr, infoLog);
-			spdlog::critical("Fragment Shader compilation failed: {}", infoLog);
-			exit(-1);
-		}
-		spdlog::debug("Compiled Fragment Shader");
-
-		GLuint shaderProgram { glCreateProgram() };
-		glAttachShader(shaderProgram, vertShader);
-		glAttachShader(shaderProgram, fragShader);
-		glLinkProgram(shaderProgram);
-
-		glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-		if (!success)
-		{
-			glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-			spdlog::critical("Failed to link Shader Program: {}", infoLog);
-			exit(-1);
-		}
-		spdlog::debug("Linked Shader Program");
-
-		glDeleteShader(vertShader);
-		glDeleteShader(fragShader);
+		Shader shader { "res/shaders/triangle.vert", "res/shaders/triangle.frag" };
 
 		float vertices[] {
-			0.5f,  0.5f, 0.0f,  // top right
-    		0.5f, -0.5f, 0.0f,  // bottom right
-    		-0.5f, -0.5f, 0.0f,  // bottom left
-    		-0.5f,  0.5f, 0.0f   // top left 
+			// positions         // colors
+    		0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+			-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+    		0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
 		};
 		unsigned int indices[] {
-			0, 1, 3,
-			1, 2, 3
+			0, 1, 2
 		};
 
 		GLuint vao {};
@@ -159,17 +101,26 @@ int main() {
 			3,
 			GL_FLOAT,
 			GL_FALSE,
-			3 * sizeof(float),
+			6 * sizeof(float),
 			nullptr
 		);
 		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(
+			1,
+			3,
+			GL_FLOAT,
+			GL_FALSE,
+			6 * sizeof(float),
+			(void*)(3 * sizeof(float))
+		);
+		glEnableVertexAttribArray(1);
 
 		while (!window.shouldClose())
 		{
 			// rendering
 			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
-			glUseProgram(shaderProgram);
+			shader.useProgram();
 			glBindVertexArray(vao);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);

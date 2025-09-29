@@ -14,4 +14,5 @@ target_link_libraries(core PUBLIC glad glfw)
 target_sources(core
 	PRIVATE
 	Window.cpp
+	Shader.cpp
 )
