@@ -8,11 +8,12 @@ file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/include/**.hpp")
 
 find_package(OpenGL REQUIRED)
 
-target_link_libraries(core PRIVATE spdlog glm OpenGL::GL)
-target_link_libraries(core PUBLIC glad glfw)
+target_link_libraries(core PRIVATE spdlog glm OpenGL::GL glad stb_image)
+target_link_libraries(core PUBLIC glfw)
 
 target_sources(core
 	PRIVATE
 	Window.cpp
 	Shader.cpp
+	Texture.cpp
 )

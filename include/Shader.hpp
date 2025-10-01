@@ -23,6 +23,8 @@ public:
 
 	void useProgram();
 
+	void setUniform(std::string name, int val);
+
 	class VertexShaderCompilationException : public std::exception
 	{
 	public:

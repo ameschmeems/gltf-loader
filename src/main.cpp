@@ -5,8 +5,10 @@
 #include <fstream>
 #include <sstream>
 #include <spdlog/spdlog.h>
+#include <stb_image.h>
 #include "Window.hpp"
 #include "Shader.hpp"
+#include "Texture.hpp"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -39,20 +41,21 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
 	}	
 }
 
-int main() {
+int main()
+{
+	try
+	{
+		#ifdef DEBUG
+		spdlog::set_level(spdlog::level::debug);
+		#endif
 
-	#ifdef DEBUG
-	spdlog::set_level(spdlog::level::debug);
-	#endif
+		glfwInit();
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		spdlog::debug("Initialized glfw");
 
-	spdlog::debug("Initialized glfw");
-
-	try {
 		Window window { WINDOW_WIDTH, WINDOW_HEIGHT, "gltf-loader", NULL, NULL };
 
 		window.makeContextCurrent();
@@ -72,14 +75,20 @@ int main() {
 
 		Shader shader { "res/shaders/triangle.vert", "res/shaders/triangle.frag" };
 
+		Texture woodTexture { "res/textures/container.jpg", GL_TEXTURE0, GL_RGBA, GL_RGB };
+
+		Texture faceTexture { "res/textures/awesomeface.png", GL_TEXTURE1 };
+
 		float vertices[] {
-			// positions         // colors
-    		0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-			-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-    		0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
+			// positions          // colors           // texture coords
+			0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+			0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+			-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+			-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
 		};
 		unsigned int indices[] {
-			0, 1, 2
+			0, 1, 3,
+			1, 2, 3
 		};
 
 		GLuint vao {};
@@ -101,7 +110,7 @@ int main() {
 			3,
 			GL_FLOAT,
 			GL_FALSE,
-			6 * sizeof(float),
+			8 * sizeof(float),
 			nullptr
 		);
 		glEnableVertexAttribArray(0);
@@ -110,10 +119,23 @@ int main() {
 			3,
 			GL_FLOAT,
 			GL_FALSE,
-			6 * sizeof(float),
+			8 * sizeof(float),
 			(void*)(3 * sizeof(float))
 		);
 		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(
+			2,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			8 * sizeof(float),
+			(void*)(6 * sizeof(float))
+		);
+		glEnableVertexAttribArray(2);
+
+		shader.useProgram();
+		shader.setUniform("woodTexture", 0);
+		shader.setUniform("faceTexture", 1);
 
 		while (!window.shouldClose())
 		{
@@ -121,6 +143,8 @@ int main() {
 			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			shader.useProgram();
+			woodTexture.bind();
+			faceTexture.bind();
 			glBindVertexArray(vao);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);

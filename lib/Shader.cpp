@@ -78,9 +78,25 @@ Shader::Shader(const std::string &vertPath, const std::string &fragPath) : _id {
 	glDeleteShader(fragShader);
 }
 
+
+/**
+ * @brief Sets shader program as active using glUseProgram
+ */
 void Shader::useProgram()
 {
 	glUseProgram(_id);
+}
+
+
+/**
+ * @brief Sets GLint uniform
+ * 
+ * @param name Uniform name
+ * @param val The GLint value the uniform should be set to
+ */
+void Shader::setUniform(std::string name, GLint val)
+{
+	glUniform1i(glGetUniformLocation(_id, name.c_str()), val);
 }
 
 Shader::VertexShaderCompilationException::VertexShaderCompilationException(const std::string &message) : _message { message } {}
