@@ -22,11 +22,11 @@ Shader::Shader(const std::string &vertPath, const std::string &fragPath) : _id {
 	const char *vertShaderSource { vertShaderStr.c_str() };
 	is.close();
 	ss.str(std::string());
-	
+
 	GLuint vertShader { glCreateShader(GL_VERTEX_SHADER) };
 	glShaderSource(vertShader, 1, &vertShaderSource, nullptr);
 	glCompileShader(vertShader);
-
+	
 	GLint success {};
 	char infoLog[512] {};
 	glGetShaderiv(vertShader, GL_COMPILE_STATUS, &success);
@@ -87,7 +87,6 @@ void Shader::useProgram()
 	glUseProgram(_id);
 }
 
-
 /**
  * @brief Sets GLint uniform
  * 
@@ -97,25 +96,4 @@ void Shader::useProgram()
 void Shader::setUniform(std::string name, GLint val)
 {
 	glUniform1i(glGetUniformLocation(_id, name.c_str()), val);
-}
-
-Shader::VertexShaderCompilationException::VertexShaderCompilationException(const std::string &message) : _message { message } {}
-
-const char *Shader::VertexShaderCompilationException::what() const throw()
-{
-	return _message.c_str();
-}
-
-Shader::FragmentShaderCompilationException::FragmentShaderCompilationException(const std::string &message) : _message { message } {}
-
-const char *Shader::FragmentShaderCompilationException::what() const throw()
-{
-	return _message.c_str();
-}
-
-Shader::ShaderProgramLinkingException::ShaderProgramLinkingException(const std::string &message) : _message { message } {}
-
-const char *Shader::ShaderProgramLinkingException::what() const throw()
-{
-	return _message.c_str();
 }

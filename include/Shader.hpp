@@ -25,34 +25,22 @@ public:
 
 	void setUniform(std::string name, int val);
 
-	class VertexShaderCompilationException : public std::exception
+	class VertexShaderCompilationException : public std::runtime_error
 	{
 	public:
-		VertexShaderCompilationException(const std::string &message) throw();
-		const char *what() const throw();
-	
-	private:
-		const std::string _message;
+		using std::runtime_error::runtime_error;
 	};
 
-	class FragmentShaderCompilationException : public std::exception
+	class FragmentShaderCompilationException : public std::runtime_error
 	{
 	public:
-		FragmentShaderCompilationException(const std::string &message) throw();
-		const char *what() const throw();
-	
-	private:
-		const std::string _message;
+		using std::runtime_error::runtime_error;
 	};
 
-	class ShaderProgramLinkingException : public std::exception
+	class ShaderProgramLinkingException : public std::runtime_error
 	{
 	public:
-		ShaderProgramLinkingException(const std::string &message) throw();
-		const char *what() const throw();
-	
-	private:
-		const std::string _message;
+		using std::runtime_error::runtime_error;
 	};
 
 private:

@@ -32,10 +32,10 @@ public:
 	int getKey(int key);
 	void swapBuffers();
 
-	class CreateWindowFailedException : public std::exception
+	class CreateWindowFailedException : public std::runtime_error
 	{
 	public:
-		const char *what() const throw();
+		using std::runtime_error::runtime_error;
 	};
 
 private:

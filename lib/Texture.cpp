@@ -50,12 +50,3 @@ void Texture::bind()
 	glActiveTexture(_target);
 	glBindTexture(GL_TEXTURE_2D, _id);
 }
-
-Texture::TextureLoadingException::TextureLoadingException(const std::string &message) throw() : _message { message }
-{
-}
-
-const char *Texture::TextureLoadingException::what() const throw()
-{
-	return _message.c_str();
-}

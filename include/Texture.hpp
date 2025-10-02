@@ -23,14 +23,10 @@ public:
 
 	void bind();
 
-	class TextureLoadingException : public std::exception
+	class TextureLoadingException : public std::runtime_error
 	{
 	public:
-		TextureLoadingException(const std::string &message) throw();
-		const char *what() const throw();
-
-	private:
-		const std::string _message;
+		using std::runtime_error::runtime_error;
 	};
 
 private:

@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
 #include <memory>
 #include <fstream>
 #include <sstream>
@@ -59,24 +58,23 @@ int main()
 		Window window { WINDOW_WIDTH, WINDOW_HEIGHT, "gltf-loader", NULL, NULL };
 
 		window.makeContextCurrent();
+		window.setFramebufferSizeCallback(framebufferSizeCallback);
+		window.setKeyCallback(keyCallback);
 
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
 			spdlog::critical("Failed to initialize GLAD");
 			exit(-1);
 		}
-
 		spdlog::debug("Initialized glad");
 
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-		window.setFramebufferSizeCallback(framebufferSizeCallback);
-		window.setKeyCallback(keyCallback);
-
+		glEnable(GL_DEPTH_TEST);
+		
 		Shader shader { "res/shaders/triangle.vert", "res/shaders/triangle.frag" };
-
+		
 		Texture woodTexture { "res/textures/container.jpg", GL_TEXTURE0, GL_RGBA, GL_RGB };
-
+		
 		Texture faceTexture { "res/textures/awesomeface.png", GL_TEXTURE1 };
 
 		float vertices[] {
@@ -155,11 +153,32 @@ int main()
 		}
 
 		glfwTerminate();
+
 		return 0;
 	}
-	catch (Window::CreateWindowFailedException e)
+	catch (Window::CreateWindowFailedException &e)
 	{
-		spdlog::critical(e.what());
+		spdlog::critical("Exception thrown: {}", e.what());
+		exit(-1);
+	}
+	catch (Shader::VertexShaderCompilationException &e)
+	{
+		spdlog::critical("Exception thrown: {}", e.what());
+		exit(-1);
+	}
+	catch (Shader::FragmentShaderCompilationException &e)
+	{
+		spdlog::critical("Exception thrown: {}", e.what());
+		exit(-1);
+	}
+	catch (Shader::ShaderProgramLinkingException &e)
+	{
+		spdlog::critical("Exception thrown: {}", e.what());
+		exit(-1);
+	}
+	catch (Texture::TextureLoadingException &e)
+	{
+		spdlog::critical("Exception thrown: {}", e.what());
 		exit(-1);
 	}
 }

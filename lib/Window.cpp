@@ -26,7 +26,7 @@ Window::Window(const int width, const int height, const std::string title, GLFWm
 {
 	if (!_window.get())
 	{
-		throw CreateWindowFailedException();
+		throw CreateWindowFailedException("Failed to create window");
 	}
 	spdlog::debug("Created new window: width={}, height={}, title={}", width, height, title);
 }
@@ -128,9 +128,4 @@ int Window::getKey(int key)
 void Window::swapBuffers()
 {
 	glfwSwapBuffers(_window.get());
-}
-
-const char *Window::CreateWindowFailedException::what() const throw()
-{
-	return "Failed to create GLFW window";
 }
