@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <spdlog/spdlog.h>
+#include <glm/gtc/type_ptr.hpp>
 
 /**
  * @brief Constructor for a Shader from a path to vertex and fragment shader
@@ -96,4 +97,15 @@ void Shader::useProgram()
 void Shader::setUniform(std::string name, GLint val)
 {
 	glUniform1i(glGetUniformLocation(_id, name.c_str()), val);
+}
+
+/**
+ * @brief Sets mat4 uniform
+ * 
+ * @param name Uniform name
+ * @param val The mat4 the uniform should be set to
+ */
+void Shader::setUniform(std::string name, glm::mat4 &val)
+{
+	glUniformMatrix4fv(glGetUniformLocation(_id, name.c_str()), 1, GL_FALSE, glm::value_ptr(val));
 }

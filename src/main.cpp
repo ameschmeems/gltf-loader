@@ -5,6 +5,8 @@
 #include <sstream>
 #include <spdlog/spdlog.h>
 #include <stb_image.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "Window.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
@@ -69,7 +71,7 @@ int main()
 		spdlog::debug("Initialized glad");
 
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-		glEnable(GL_DEPTH_TEST);
+		// glEnable(GL_DEPTH_TEST);
 		
 		Shader shader { "res/shaders/triangle.vert", "res/shaders/triangle.frag" };
 		
@@ -144,6 +146,16 @@ int main()
 			woodTexture.bind();
 			faceTexture.bind();
 			glBindVertexArray(vao);
+			glm::mat4 trans = glm::mat4(1.0f);
+			trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+			trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+			shader.setUniform("transform", trans);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			trans = glm::mat4(1.0f);
+			trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
+			float scale = std::max(sinf(glfwGetTime()), -sinf(glfwGetTime()));
+			trans = glm::scale(trans, glm::vec3(scale));
+			shader.setUniform("transform", trans);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
 
@@ -152,6 +164,9 @@ int main()
 			glfwPollEvents();
 		}
 
+		glDeleteVertexArrays(1, &vao);
+		glDeleteBuffers(1, &vbo);
+		glDeleteBuffers(1, &ebo);
 		glfwTerminate();
 
 		return 0;

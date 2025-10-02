@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include <stdexcept>
+#include <glm/glm.hpp>
 
 /**
  * @class Shader Shader.hpp "include/Shader.hpp"
@@ -23,7 +24,8 @@ public:
 
 	void useProgram();
 
-	void setUniform(std::string name, int val);
+	void setUniform(std::string name, GLint val);
+	void setUniform(std::string name, glm::mat4 &val);
 
 	class VertexShaderCompilationException : public std::runtime_error
 	{
