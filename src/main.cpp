@@ -71,7 +71,7 @@ int main()
 		spdlog::debug("Initialized glad");
 
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-		// glEnable(GL_DEPTH_TEST);
+		glEnable(GL_DEPTH_TEST);
 		
 		Shader shader { "res/shaders/triangle.vert", "res/shaders/triangle.frag" };
 		
@@ -79,12 +79,48 @@ int main()
 		
 		Texture faceTexture { "res/textures/awesomeface.png", GL_TEXTURE1 };
 
-		float vertices[] {
-			// positions          // colors           // texture coords
-			0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-			0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-			-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-			-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+		float vertices[] = {
+			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+			0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+			0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+			0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+			0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+			0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+			0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+			-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+			-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+			0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+			0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+			0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+			0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+			0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+			0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+			0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+			0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+			0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+			0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+			0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+			0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+			-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 		};
 		unsigned int indices[] {
 			0, 1, 3,
@@ -110,28 +146,19 @@ int main()
 			3,
 			GL_FLOAT,
 			GL_FALSE,
-			8 * sizeof(float),
+			5 * sizeof(float),
 			nullptr
 		);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(
 			1,
-			3,
+			2,
 			GL_FLOAT,
 			GL_FALSE,
-			8 * sizeof(float),
+			5 * sizeof(float),
 			(void*)(3 * sizeof(float))
 		);
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(
-			2,
-			2,
-			GL_FLOAT,
-			GL_FALSE,
-			8 * sizeof(float),
-			(void*)(6 * sizeof(float))
-		);
-		glEnableVertexAttribArray(2);
 
 		shader.useProgram();
 		shader.setUniform("woodTexture", 0);
@@ -141,22 +168,21 @@ int main()
 		{
 			// rendering
 			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			shader.useProgram();
 			woodTexture.bind();
 			faceTexture.bind();
 			glBindVertexArray(vao);
-			glm::mat4 trans = glm::mat4(1.0f);
-			trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-			trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-			shader.setUniform("transform", trans);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			trans = glm::mat4(1.0f);
-			trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
-			float scale = std::max(sinf(glfwGetTime()), -sinf(glfwGetTime()));
-			trans = glm::scale(trans, glm::vec3(scale));
-			shader.setUniform("transform", trans);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glm::mat4 model { glm::mat4(1.0f) };
+			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+			glm::mat4 view { glm::mat4(1.0f) };
+			view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+			glm::mat4 projection { glm::perspective(glm::radians(45.0f), static_cast<float>(WINDOW_WIDTH)/static_cast<float>(WINDOW_HEIGHT), 0.1f, 100.0f) };
+			shader.setUniform("model", model);
+			shader.setUniform("view", view);
+			shader.setUniform("projection", projection);
+			// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 			glBindVertexArray(0);
 
 			// check and call events and swap buffers
