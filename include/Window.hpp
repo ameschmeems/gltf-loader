@@ -27,6 +27,8 @@ public:
 	void makeContextCurrent();
 	GLFWframebuffersizefun setFramebufferSizeCallback(GLFWframebuffersizefun callback);
 	GLFWkeyfun setKeyCallback(GLFWkeyfun callback);
+	GLFWcursorposfun setCursorPosCallback(GLFWcursorposfun callback);
+	GLFWscrollfun setScrollCallback(GLFWscrollfun callback);
 	bool shouldClose();
 	void setWindowShouldClose(bool value);
 	int getKey(int key);

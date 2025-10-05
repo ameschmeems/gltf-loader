@@ -83,11 +83,35 @@ GLFWframebuffersizefun Window::setFramebufferSizeCallback(GLFWframebuffersizefun
  * 
  * @param callback Function pointer to desired callback method
  * 
- * @returns The previously set callback, or NULL if not callback was set or glfw had not been initialized.
+ * @returns The previously set callback, or NULL if no callback was set or glfw had not been initialized.
  */
 GLFWkeyfun Window::setKeyCallback(GLFWkeyfun callback)
 {
 	return glfwSetKeyCallback(_window.get(), callback);
+}
+
+/**
+ * @brief Sets cursor pos callback for window using glfwSetCursorPosCallback
+ * 
+ * @param callback Function pointer to desired callback method
+ * 
+ * @returns The previously set callback, or NULL if no callback was set or glfw had not been initialized. 
+ */
+GLFWcursorposfun Window::setCursorPosCallback(GLFWcursorposfun callback)
+{
+	return glfwSetCursorPosCallback(_window.get(), callback);
+}
+
+/**
+ * @brief Sets scroll callback for window using glfwSetScrollCallback
+ * 
+ * @param callback Function pointer to desired callback method
+ * 
+ * @returns The previously set callback, or NULL if no callback was set or glfw had not been initialized.
+ */
+GLFWscrollfun Window::setScrollCallback(GLFWscrollfun callback)
+{
+	return glfwSetScrollCallback(_window.get(), callback);
 }
 
 /**
