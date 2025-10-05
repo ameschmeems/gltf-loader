@@ -10,15 +10,12 @@
 #include "Window.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
+#include "Camera.hpp"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
-float fov { 45.0f };
-
-glm::vec3 cameraPos { 0.0f, 0.0f, 3.0f };
-glm::vec3 cameraFront { 0.0f, 0.0f, -1.0f };
-glm::vec3 cameraUp { 0.0f, 1.0f, 0.0f };
+Camera camera { glm::vec3(0.0f, 0.0f, 3.0f) };
 
 float deltaTime { 0.0f };
 float lastFrame { 0.0f };
@@ -26,9 +23,6 @@ float lastFrame { 0.0f };
 bool firstMouse { true };
 float lastMouseX { WINDOW_WIDTH / 2.0f };
 float lastMouseY { WINDOW_HEIGHT / 2.0f };
-
-float yaw { -90.0f };
-float pitch { 0.0f };
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
@@ -91,43 +85,38 @@ void mouseCallback(GLFWwindow *window, double xPos, double yPos)
 	xOffset *= sensitivity;
 	yOffset *= sensitivity;
 
-	yaw += xOffset;
-	pitch -= yOffset;
+	camera.setYaw(camera.getYaw() + xOffset);
+	float pitch { camera.getPitch() - yOffset };
 	if(pitch > 89.0f)
 		pitch =  89.0f;
 	if(pitch < -89.0f)
 		pitch = -89.0f;
-
-	glm::vec3 direction {
-		cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
-		sin(glm::radians(pitch)),
-		sin(glm::radians(yaw)) * cos(glm::radians(pitch))
-	};
-
-	cameraFront = glm::normalize(direction);
+	camera.setPitch(pitch);
+	camera.updateVectors();
 }
 
 void scrollCallback(GLFWwindow *window, double xOffset, double yOffset)
 {
-	fov -= static_cast<float>(yOffset);
+	float fov { camera.getFov() - static_cast<float>(yOffset) };
 	if (fov < 1.0f)
 		fov = 1.0f;
 	if (fov > 45.0f);
 		fov = 45.0f;
+	camera.setFov(fov);
 }
 
 // Doing this in keyCallback makes the movement feel laggy
 void processMovementInput(Window &window)
 {
-	float cameraSpeed { 2.5f * deltaTime };
+	float cameraSpeed { camera.getSpeed() * deltaTime };
 	if (window.getKey(GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += cameraSpeed * cameraFront;
+		camera.setPosition(camera.getPosition() + cameraSpeed * camera.getFront());
 	if (window.getKey(GLFW_KEY_S) == GLFW_PRESS)
-		cameraPos -= cameraSpeed * cameraFront;
+		camera.setPosition(camera.getPosition() - cameraSpeed * camera.getFront());
 	if (window.getKey(GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.setPosition(camera.getPosition() - glm::normalize(glm::cross(camera.getFront(), camera.getUp())) * cameraSpeed);
 	if (window.getKey(GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.setPosition(camera.getPosition() + glm::normalize(glm::cross(camera.getFront(), camera.getUp())) * cameraSpeed);
 }
 
 int main()
@@ -272,9 +261,9 @@ int main()
 			glm::mat4 model { 1.0f };
 			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 			glm::mat4 view {
-				glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp)
+				camera.getViewMatrix()
 			};
-			glm::mat4 projection { glm::perspective(glm::radians(fov), static_cast<float>(WINDOW_WIDTH)/static_cast<float>(WINDOW_HEIGHT), 0.1f, 100.0f) };
+			glm::mat4 projection { glm::perspective(glm::radians(camera.getFov()), static_cast<float>(WINDOW_WIDTH)/static_cast<float>(WINDOW_HEIGHT), 0.1f, 100.0f) };
 			shader.setUniform("model", model);
 			shader.setUniform("view", view);
 			shader.setUniform("projection", projection);

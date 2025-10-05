@@ -16,4 +16,5 @@ target_sources(core
 	Window.cpp
 	Shader.cpp
 	Texture.cpp
+	Camera.cpp
 )
