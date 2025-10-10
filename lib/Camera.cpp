@@ -24,7 +24,7 @@ void Camera::updateVectors()
 			sin(glm::radians(_yaw)) * cos(glm::radians(_pitch))
 		)
 	);
-	_right = glm::normalize(glm::cross(_front, worldUp));
+	_right = glm::normalize(glm::cross(_front, _worldUp));
 	_up = glm::normalize(glm::cross(_right, _front));
 }
 
@@ -35,6 +35,7 @@ void Camera::updateVectors()
  */
 glm::mat4 Camera::getViewMatrix()
 {
+	updateVectors();
 	return glm::lookAt(_pos, _pos + _front, _up);
 }
 

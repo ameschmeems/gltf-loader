@@ -92,7 +92,6 @@ void mouseCallback(GLFWwindow *window, double xPos, double yPos)
 	if(pitch < -89.0f)
 		pitch = -89.0f;
 	camera.setPitch(pitch);
-	camera.updateVectors();
 }
 
 void scrollCallback(GLFWwindow *window, double xOffset, double yOffset)

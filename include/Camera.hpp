@@ -40,7 +40,7 @@ private:
 	glm::vec3 _front { 0.0f, 0.0f, -1.0f };
 	glm::vec3 _up {};
 	glm::vec3 _right {};
-	glm::vec3 worldUp { 0.0f, 1.0f, 0.0f };
+	glm::vec3 _worldUp { 0.0f, 1.0f, 0.0f };
 	float _yaw { -90.0f };
 	float _pitch { 0.0f };
 	float _speed { 2.5f };
