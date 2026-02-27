@@ -11,6 +11,7 @@
 #include "Shader.hpp"
 #include "Texture.hpp"
 #include "Camera.hpp"
+#include "Model.hpp"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -152,95 +153,8 @@ int main()
 		glEnable(GL_DEPTH_TEST);
 		
 		Shader shader { "res/shaders/triangle.vert", "res/shaders/triangle.frag" };
-		
-		Texture woodTexture { "res/textures/container.jpg", GL_TEXTURE0, GL_RGBA, GL_RGB };
-		
-		Texture faceTexture { "res/textures/awesomeface.png", GL_TEXTURE1 };
 
-		float vertices[] = {
-			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-			0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-			0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-			0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-			0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-			0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-			0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-			-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-			-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-			0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-			0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-			0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-			0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-			0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-			0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-			0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-			0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-			0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-			0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-			0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-			0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-			-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-		};
-		unsigned int indices[] {
-			0, 1, 3,
-			1, 2, 3
-		};
-
-		GLuint vao {};
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-
-		GLuint vbo {};
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		
-		GLuint ebo {};
-		glGenBuffers(1, &ebo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(
-			0,
-			3,
-			GL_FLOAT,
-			GL_FALSE,
-			5 * sizeof(float),
-			nullptr
-		);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(
-			1,
-			2,
-			GL_FLOAT,
-			GL_FALSE,
-			5 * sizeof(float),
-			(void*)(3 * sizeof(float))
-		);
-		glEnableVertexAttribArray(1);
-
-		shader.useProgram();
-		shader.setUniform("woodTexture", 0);
-		shader.setUniform("faceTexture", 1);
+		Model model { "res/models/blahaj.glb" };
 
 		while (!window.shouldClose())
 		{
@@ -254,30 +168,27 @@ int main()
 			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			shader.useProgram();
-			woodTexture.bind();
-			faceTexture.bind();
-			glBindVertexArray(vao);
-			glm::mat4 model { 1.0f };
-			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 			glm::mat4 view {
 				camera.getViewMatrix()
 			};
 			glm::mat4 projection { glm::perspective(glm::radians(camera.getFov()), static_cast<float>(WINDOW_WIDTH)/static_cast<float>(WINDOW_HEIGHT), 0.1f, 100.0f) };
-			shader.setUniform("model", model);
 			shader.setUniform("view", view);
 			shader.setUniform("projection", projection);
+			
+			glm::mat4 modelMat = glm::mat4(1.0f);
+        	modelMat = glm::translate(modelMat, glm::vec3(0.0f, 0.0f, 0.0f));
+        	modelMat = glm::scale(modelMat, glm::vec3(1.0f, 1.0f, 1.0f));
+			shader.setUniform("model", modelMat);
+			model.draw(shader);
 			// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-			glBindVertexArray(0);
+			// glDrawArrays(GL_TRIANGLES, 0, 36);
+			// glBindVertexArray(0);
 
 			// check and call events and swap buffers
 			window.swapBuffers();
 			glfwPollEvents();
 		}
 
-		glDeleteVertexArrays(1, &vao);
-		glDeleteBuffers(1, &vbo);
-		glDeleteBuffers(1, &ebo);
 		glfwTerminate();
 
 		return 0;
@@ -303,6 +214,11 @@ int main()
 		exit(-1);
 	}
 	catch (Texture::TextureLoadingException &e)
+	{
+		spdlog::critical("Exception thrown: {}", e.what());
+		exit(-1);
+	}
+	catch (Model::ModelLoadingException &e)
 	{
 		spdlog::critical("Exception thrown: {}", e.what());
 		exit(-1);

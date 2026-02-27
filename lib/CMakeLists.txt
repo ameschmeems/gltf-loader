@@ -1,6 +1,7 @@
 add_library(core)
 
 target_include_directories(core PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(core PUBLIC ${PROJECT_SOURCE_DIR}/extern/cgltf)
 
 target_compile_features(core PUBLIC cxx_std_14)
 
@@ -8,7 +9,7 @@ file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/include/**.hpp")
 
 find_package(OpenGL REQUIRED)
 
-target_link_libraries(core PRIVATE spdlog OpenGL::GL glad stb_image)
+target_link_libraries(core PRIVATE spdlog OpenGL::GL glad stb_image assimp)
 target_link_libraries(core PUBLIC glfw glm)
 
 target_sources(core
@@ -17,4 +18,6 @@ target_sources(core
 	Shader.cpp
 	Texture.cpp
 	Camera.cpp
+	Mesh.cpp
+	Model.cpp
 )
