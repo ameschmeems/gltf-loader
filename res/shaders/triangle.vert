@@ -8,9 +8,11 @@ uniform mat4 view;
 uniform mat4 projection;
 
 out vec3 normal;
+out vec2 texCoords;
 
 void main()
 {
 	normal = aNormal;
+	texCoords = aTexCoords;
     gl_Position = projection * view * model * vec4(aPos, 1.0);
 }

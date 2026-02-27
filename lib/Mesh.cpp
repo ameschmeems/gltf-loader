@@ -20,9 +20,28 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
  */
 void Mesh::draw(Shader &shader)
 {
+	unsigned int diffuseNr { 1 };
+	unsigned int specularNr { 1 };
+
+	for (unsigned int i = 0; i < _textures.size(); i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		std::string number {};
+		std::string name = _textures[i].getType();
+		if (name == "texture_diffuse")
+			number = std::to_string(diffuseNr++);
+		else if (name == "texture_specular")
+			number = std::to_string(specularNr++);
+
+		shader.setUniform(name + number, i);
+		glBindTexture(GL_TEXTURE_2D, _textures[i].getId());
+	}
+
 	glBindVertexArray(_vao);
 	glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(_indices.size()), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void Mesh::_setupMesh()

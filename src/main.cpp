@@ -154,7 +154,7 @@ int main()
 		
 		Shader shader { "res/shaders/triangle.vert", "res/shaders/triangle.frag" };
 
-		Model model { "res/models/blahaj.glb" };
+		Model model { "res/models/backpack/backpack.obj" };
 
 		while (!window.shouldClose())
 		{

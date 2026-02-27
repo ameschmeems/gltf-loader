@@ -6,20 +6,16 @@
  * @brief Constructor for a Texture from a path to an image file
  * 
  * @param path The path to an image file
- * @param target The desired texture unit
- * @param internalFormat The format that openGL should store the texture as. Defaults to GL_RGBA
- * @param format The format that the image is stored as. Defaults to GL_RGBA
  * @param type The type that the image is stored as. Defaults to GL_UNSIGNED_BYTE
  * @param flipVertically Decides whether the image should be flipped vertically or not. Defaults to true
  * 
  * @throws TextureLoadingException if texture failed to load
  */
-Texture::Texture(const std::string &path, GLenum target, GLint internalFormat, GLenum format, GLenum type, bool flipVertically)
-	: _target { target }
+Texture::Texture(const std::string &path, const std::string &typeName, GLenum type, bool flipVertically)
 {
 	glGenTextures(1, &_id);
 	
-	this->bind();
+	glBindTexture(GL_TEXTURE_2D, _id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -30,7 +26,14 @@ Texture::Texture(const std::string &path, GLenum target, GLint internalFormat, G
 	unsigned char *data = stbi_load(path.c_str(), &_width, &_height, &_nrChannels, 0);
 	if (data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, format, type, data);
+		GLenum format {};
+		if (_nrChannels == 1)
+			format = GL_RED;
+		else if (_nrChannels == 3)
+			format = GL_RGB;
+		else if (_nrChannels == 4)
+			format = GL_RGBA;
+		glTexImage2D(GL_TEXTURE_2D, 0, format, _width, _height, 0, format, type, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
@@ -42,11 +45,17 @@ Texture::Texture(const std::string &path, GLenum target, GLint internalFormat, G
 	stbi_image_free(data);
 }
 
-/**
- * @brief Binds the texture as active
- */
-void Texture::bind()
+void Texture::setType(std::string &type)
 {
-	glActiveTexture(_target);
-	glBindTexture(GL_TEXTURE_2D, _id);
+	_type = type;
+}
+
+const std::string &Texture::getType()
+{
+	return _type;
+}
+
+GLuint Texture::getId()
+{
+	return _id;
 }

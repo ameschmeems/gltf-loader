@@ -103,8 +103,30 @@ Mesh Model::_processMesh(aiMesh *mesh, const aiScene *scene)
 
 	if (mesh->mMaterialIndex >= 0)
 	{
-		// TODO: process material
+		aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+		std::vector<Texture> diffuseMaps = _loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+		std::vector<Texture> specularMaps = _loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	}
 
 	return Mesh(vertices, indices, textures);
+}
+
+std::vector<Texture> Model::_loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
+{
+	std::vector<Texture> textures {};
+	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
+	{
+		aiString str {};
+		mat->GetTexture(type, i, &str);
+		std::string texPath = _directory + "/" + std::string(str.C_Str());
+		
+		if (std::find(_textures_loaded.begin(), _textures_loaded.end(), texPath) != _textures_loaded.end())
+			continue;
+		Texture texture { texPath, typeName };
+		_textures_loaded.push_back(texPath);
+		textures.push_back(texture);
+	}
+	return textures;
 }

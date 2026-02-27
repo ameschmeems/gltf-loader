@@ -15,13 +15,16 @@ public:
 	Texture() = delete;
 	Texture(const Texture &rhs) = default;
 	Texture(Texture &&rhs) = default;
-	Texture(const std::string &path, GLenum target, GLint internalFormat=GL_RGBA, GLenum format=GL_RGBA, GLenum type=GL_UNSIGNED_BYTE, bool flipVertically=true);
+	Texture(const std::string &path, const std::string &typeName, GLenum type=GL_UNSIGNED_BYTE, bool flipVertically=true);
+
 	~Texture() = default;
 
 	Texture &operator=(const Texture &rhs) = default;
 	Texture &operator=(Texture &&rhs) = default;
 
-	void bind();
+	void setType(std::string &type);
+	const std::string &getType();
+	GLuint getId();
 
 	class TextureLoadingException : public std::runtime_error
 	{
@@ -32,7 +35,7 @@ public:
 private:
 
 	GLuint _id {};
-	GLenum _target {};
+	std::string _type {};
 	int _width {};
 	int _height {};
 	int _nrChannels{};
