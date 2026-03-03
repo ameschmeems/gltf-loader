@@ -14,7 +14,7 @@ class Model
 {
 public:
 
-	Model(char *path);
+	Model(std::string &path);
 
 	void draw(Shader &shader);
 

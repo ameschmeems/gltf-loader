@@ -63,6 +63,8 @@ GLFWwindow *Window::getWindowPtr()
  */
 void Window::makeContextCurrent()
 {
+	spdlog::debug("Setting window as current glfw context");
+
 	glfwMakeContextCurrent(_window.get());
 }
 
@@ -131,6 +133,7 @@ bool Window::shouldClose()
  */
 void Window::setWindowShouldClose(bool value)
 {
+	spdlog::debug("Setting windowShouldClose to: {}", value);
 	glfwSetWindowShouldClose(_window.get(), value);
 }
 

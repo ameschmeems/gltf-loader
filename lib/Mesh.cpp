@@ -1,4 +1,5 @@
 #include "Mesh.hpp"
+#include <spdlog/spdlog.h>
 
 /**
  * @brief Constructor for a Mesh, from vectors of vertices, indices, and textures
@@ -10,6 +11,13 @@
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
 	: _vertices { vertices }, _indices { indices }, _textures { textures }
 {
+	spdlog::debug(
+		"Loading mesh with {} vertices, {} indices, {} textures.",
+		_vertices.size(),
+		_indices.size(),
+		_textures.size()
+	);
+
 	_setupMesh();
 }
 
@@ -87,7 +95,6 @@ void Mesh::_setupMesh()
 		(void*)offsetof(Vertex, TexCoords)
 	);
 	glEnableVertexAttribArray(2);
-
 
 	glBindVertexArray(0);
 }

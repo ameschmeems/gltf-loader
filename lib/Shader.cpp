@@ -16,6 +16,12 @@
  */
 Shader::Shader(const std::string &vertPath, const std::string &fragPath) : _id { glCreateProgram() }
 {
+	spdlog::debug(
+		"Loading shaders from files: vertex: {}, fragment: {}",
+		vertPath,
+		fragPath
+	);
+
 	std::ifstream is { vertPath };
 	std::stringstream ss {};
 	ss << is.rdbuf();

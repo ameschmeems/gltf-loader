@@ -1,5 +1,7 @@
 #include "Model.hpp"
 #include <iostream>
+#include <tiny_gltf.h>
+#include <spdlog/spdlog.h>
 
 /**
  * @brief Constructor for a model from a file
@@ -8,9 +10,32 @@
  * 
  * @throws ModelLoadingException if assimp fails to load file
  */
-Model::Model(char *path)
+Model::Model(std::string &path)
 {
-	_loadModel(path);
+	// _loadModel(path);
+
+	spdlog::debug("Loading model from file: {}", path);
+
+	tinygltf::Model m {};
+	tinygltf::TinyGLTF loader {};
+	std::string err {};
+	std::string warn {};
+
+	bool ret = loader.LoadASCIIFromFile(&m, &err, &warn, path);
+
+	if (!warn.empty()) {
+		spdlog::warn("TinyGLTF: {}", warn);
+	}
+
+	if (!err.empty()) {
+		spdlog::error("TinyGLTF: {}", err);
+	}
+
+	if (!ret) {
+		throw ModelLoadingException("Failed to load model: " + path);
+	}
+
+	spdlog::debug("Loaded model file with TinyGLTF");
 }
 
 /**

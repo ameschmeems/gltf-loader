@@ -1,5 +1,6 @@
 #include "Camera.hpp"
 #include <glm/gtc/matrix_transform.hpp>
+#include <spdlog/spdlog.h>
 
 /**
  * @brief Constructor for Camera with position and up vectors
