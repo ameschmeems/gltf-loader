@@ -10,7 +10,7 @@ file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/include/**.hpp")
 
 find_package(OpenGL REQUIRED)
 
-target_link_libraries(core PRIVATE spdlog OpenGL::GL glad assimp tinygltf)
+target_link_libraries(core PRIVATE spdlog OpenGL::GL glad tinygltf)
 target_link_libraries(core PUBLIC glfw glm)
 
 target_sources(core
