@@ -21,7 +21,6 @@ add_subdirectory(extern/spdlog)
 add_subdirectory(extern/glm)
 add_subdirectory(extern/glad)
 add_subdirectory(extern/glfw)
-add_subdirectory(extern/assimp)
 
 set(TINYGLTF_HEADER_ONLY OFF CACHE INTERNAL "" FORCE)
 set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)

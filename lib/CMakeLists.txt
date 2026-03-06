@@ -1,7 +1,6 @@
 add_library(core)
 
 target_include_directories(core PUBLIC ${PROJECT_SOURCE_DIR}/include)
-# target_include_directories(core PUBLIC ${PROJECT_SOURCE_DIR}/extern/cgltf)
 target_include_directories(core PUBLIC ${PROJECT_SOURCE_DIR}/extern/tinygltf)
 
 target_compile_features(core PUBLIC cxx_std_14)

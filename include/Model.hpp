@@ -24,12 +24,7 @@ public:
 
 private:
 
-	void _processScene(tinygltf::Scene &scene);
-
-	// void _loadModel(std::string path);
-	// void _processNode(aiNode *node, const aiScene *scene);
-	// Mesh _processMesh(aiMesh *mesh, const aiScene *scene);
-	// std::vector<Texture> _loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
+	void _processScene(tinygltf::Model &model, size_t scene_index);
 
 	std::vector<Mesh> _meshes {};
 	std::string _directory {};

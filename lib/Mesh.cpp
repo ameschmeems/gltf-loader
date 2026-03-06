@@ -2,23 +2,30 @@
 #include <spdlog/spdlog.h>
 
 /**
- * @brief Constructor for a Mesh, from vectors of vertices, indices, and textures
+ * @brief Constructor for a Mesh, from tinygltf mesh object
  * 
- * @param vertices vector of vertices of the mesh
- * @param indices vector of indices of the mesh
- * @param textures vector of textures of the mesh
+ * @param model Model loaded from tinygltf
+ * @param mesh Mesh loaded from tinygltf
  */
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
-	: _vertices { vertices }, _indices { indices }, _textures { textures }
+Mesh::Mesh(tinygltf::Model &model, tinygltf::Mesh &mesh)
 {
-	spdlog::debug(
-		"Loading mesh with {} vertices, {} indices, {} textures.",
-		_vertices.size(),
-		_indices.size(),
-		_textures.size()
-	);
+	glGenVertexArrays(1, &_vao);
+	glBindVertexArray(_vao);
 
-	_setupMesh();
+	for (auto primitive : mesh.primitives)
+	{
+		if (primitive.indices > -1)
+		{
+			_processIndices(model, model.accessors[primitive.indices]);
+		}
+
+		if (primitive.attributes.find("POSITION") != primitive.attributes.end())
+		{
+			_processVertices(model, model.accessors[primitive.attributes.at("POSITION")]);
+		}
+	}
+
+	glBindVertexArray(0);
 }
 
 /**
@@ -28,28 +35,59 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
  */
 void Mesh::draw(Shader &shader)
 {
-	unsigned int diffuseNr { 1 };
-	unsigned int specularNr { 1 };
-
-	for (unsigned int i = 0; i < _textures.size(); i++)
-	{
-		glActiveTexture(GL_TEXTURE0 + i);
-		std::string number {};
-		std::string name = _textures[i].getType();
-		if (name == "texture_diffuse")
-			number = std::to_string(diffuseNr++);
-		else if (name == "texture_specular")
-			number = std::to_string(specularNr++);
-
-		shader.setUniform(name + number, i);
-		glBindTexture(GL_TEXTURE_2D, _textures[i].getId());
-	}
-
 	glBindVertexArray(_vao);
-	glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(_indices.size()), GL_UNSIGNED_INT, 0);
+	glDrawElements(
+		GL_TRIANGLES,
+		_elementCount,
+		_elementComponentType,
+		0
+	);
 	glBindVertexArray(0);
+}
 
-	glActiveTexture(GL_TEXTURE0);
+void Mesh::_processIndices(tinygltf::Model &model, tinygltf::Accessor &accessor)
+{
+	tinygltf::BufferView &bufferView { model.bufferViews[accessor.bufferView] };
+	tinygltf::Buffer &buffer { model.buffers[bufferView.buffer] };
+	GLenum target { bufferView.target > -1 ? static_cast<GLenum>(bufferView.target) : GL_ELEMENT_ARRAY_BUFFER };
+
+	glGenBuffers(1, &_ebo);
+	glBindBuffer(target, _ebo);
+	glBufferData(
+		target,
+		bufferView.byteLength,
+		&buffer.data[bufferView.byteOffset],
+		GL_STATIC_DRAW
+	);
+
+	_elementCount = accessor.count;
+	_elementComponentType = accessor.componentType;
+}
+
+void Mesh::_processVertices(tinygltf::Model &model, tinygltf::Accessor &accessor)
+{
+	tinygltf::BufferView &bufferView { model.bufferViews[accessor.bufferView] };
+	tinygltf::Buffer &buffer { model.buffers[bufferView.buffer] };
+	GLenum target { bufferView.target > -1 ? static_cast<GLenum>(bufferView.target) : GL_ARRAY_BUFFER };
+
+	glGenBuffers(1, &_vbo);
+	glBindBuffer(target, _vbo);
+	glBufferData(
+		target,
+		bufferView.byteLength,
+		&buffer.data[bufferView.byteOffset],
+		GL_STATIC_DRAW
+	);
+
+	glVertexAttribPointer(
+		0,
+		3,
+		accessor.componentType,
+		GL_FALSE,
+		accessor.byteOffset,
+		0
+	);
+	glEnableVertexAttribArray(0);
 }
 
 void Mesh::_setupMesh()

@@ -154,7 +154,7 @@ int main()
 		
 		Shader shader { "res/shaders/triangle.vert", "res/shaders/triangle.frag" };
 
-		Model model { std::string("res/models/triangle.gltf") };
+		Model model { std::string("res/models/Cube/Cube.gltf") };
 
 		while (!window.shouldClose())
 		{
