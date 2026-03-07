@@ -5,12 +5,9 @@
 #include "Texture.hpp"
 #include "Shader.hpp"
 
-struct Vertex
-{
-	glm::vec3 Position;
-	glm::vec3 Normal;
-	glm::vec2 TexCoords;
-};
+#define VERTEX_ATTRIB_POSITION 0
+#define VERTEX_ATTRIB_NORMAL 1
+#define VERTEX_ATTRIB_TEX_COORD_0 2
 
 /**
  * @class Mesh Mesh.hpp "include/Mesh.hpp"
@@ -29,15 +26,14 @@ private:
 	void _setupMesh();
 	void _processIndices(tinygltf::Model &model, tinygltf::Accessor &accessor);
 	void _processVertices(tinygltf::Model &model, tinygltf::Accessor &accessor);
-
-	std::vector<Vertex> _vertices {};
-	std::vector<unsigned int> _indices {};
-	std::vector<Texture> _textures {};
+	void _processNormals(tinygltf::Model &model, tinygltf::Accessor &accessor);
 
 	unsigned int _elementCount {};
+	unsigned int _elementOffset {};
 	GLenum _elementComponentType {};
 
 	unsigned int _vao {};
-	unsigned int _vbo {};
+	unsigned int _positionVbo {};
+	unsigned int _normalVbo {};
 	unsigned int _ebo {};
 };

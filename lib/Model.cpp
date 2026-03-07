@@ -1,6 +1,7 @@
 #include "Model.hpp"
 #include <iostream>
 #include <spdlog/spdlog.h>
+#include <glm/glm.hpp>
 
 /**
  * @brief Constructor for a model from a file. If default scene not specified, reads scene at index 0
@@ -11,8 +12,6 @@
  */
 Model::Model(std::string &path)
 {
-	// _loadModel(path);
-
 	spdlog::debug("Loading model from file: {}", path);
 
 	tinygltf::Model m {};
@@ -52,15 +51,28 @@ void Model::draw(Shader &shader)
 	}
 }
 
-void Model::_processScene(tinygltf::Model &model, size_t scene_index)
+void Model::_processScene(tinygltf::Model &model, size_t sceneIndex)
 {
-	tinygltf::Scene &scene = model.scenes[scene_index];
-	for (size_t i = 0; i < scene.nodes.size(); i++)
+	spdlog::debug("Processing Scene: {}", sceneIndex);
+
+	tinygltf::Scene &scene = model.scenes[sceneIndex];
+
+	for (auto i : scene.nodes)
 	{
-		spdlog::debug("Processing node: {}", scene.nodes[i]);
-		if (model.nodes[i].mesh > -1)
-		{
-			_meshes.push_back(Mesh { model, model.meshes[model.nodes[i].mesh] });
-		}
+		_processNode(model, model.nodes[i]);
+	}
+}
+
+void Model::_processNode(tinygltf::Model &model, tinygltf::Node &node)
+{
+	if (node.mesh > -1)
+	{
+		spdlog::debug("Processing Mesh: {}", node.mesh);
+		_meshes.push_back(Mesh { model, model.meshes[node.mesh] });
+	}
+
+	for (auto child : node.children)
+	{
+		_processNode(model, model.nodes[child]);
 	}
 }

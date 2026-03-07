@@ -24,7 +24,8 @@ public:
 
 private:
 
-	void _processScene(tinygltf::Model &model, size_t scene_index);
+	void _processScene(tinygltf::Model &model, size_t sceneIndex);
+	void _processNode(tinygltf::Model &model, tinygltf::Node &node);
 
 	std::vector<Mesh> _meshes {};
 	std::string _directory {};

@@ -23,6 +23,11 @@ Mesh::Mesh(tinygltf::Model &model, tinygltf::Mesh &mesh)
 		{
 			_processVertices(model, model.accessors[primitive.attributes.at("POSITION")]);
 		}
+
+		if (primitive.attributes.find("NORMAL") != primitive.attributes.end())
+		{
+			_processNormals(model, model.accessors[primitive.attributes.at("NORMAL")]);
+		}
 	}
 
 	glBindVertexArray(0);
@@ -40,7 +45,7 @@ void Mesh::draw(Shader &shader)
 		GL_TRIANGLES,
 		_elementCount,
 		_elementComponentType,
-		0
+		(void*)_elementOffset
 	);
 	glBindVertexArray(0);
 }
@@ -56,12 +61,13 @@ void Mesh::_processIndices(tinygltf::Model &model, tinygltf::Accessor &accessor)
 	glBufferData(
 		target,
 		bufferView.byteLength,
-		&buffer.data[bufferView.byteOffset],
+		buffer.data.data() + bufferView.byteOffset,
 		GL_STATIC_DRAW
 	);
 
 	_elementCount = accessor.count;
 	_elementComponentType = accessor.componentType;
+	_elementOffset = accessor.byteOffset;
 }
 
 void Mesh::_processVertices(tinygltf::Model &model, tinygltf::Accessor &accessor)
@@ -70,69 +76,48 @@ void Mesh::_processVertices(tinygltf::Model &model, tinygltf::Accessor &accessor
 	tinygltf::Buffer &buffer { model.buffers[bufferView.buffer] };
 	GLenum target { bufferView.target > -1 ? static_cast<GLenum>(bufferView.target) : GL_ARRAY_BUFFER };
 
-	glGenBuffers(1, &_vbo);
-	glBindBuffer(target, _vbo);
+	glGenBuffers(1, &_positionVbo);
+	glBindBuffer(target, _positionVbo);
 	glBufferData(
 		target,
 		bufferView.byteLength,
-		&buffer.data[bufferView.byteOffset],
+		buffer.data.data() + bufferView.byteOffset,
 		GL_STATIC_DRAW
 	);
 
 	glVertexAttribPointer(
-		0,
+		VERTEX_ATTRIB_POSITION,
 		3,
 		accessor.componentType,
 		GL_FALSE,
-		accessor.byteOffset,
-		0
+		bufferView.byteStride,
+		(void*)(accessor.byteOffset)
 	);
-	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(VERTEX_ATTRIB_POSITION);
 }
 
-void Mesh::_setupMesh()
+void Mesh::_processNormals(tinygltf::Model &model, tinygltf::Accessor &accessor)
 {
-	glGenVertexArrays(1, &_vao);
-	glBindVertexArray(_vao);
-	glGenBuffers(1, &_vbo);
-	glGenBuffers(1, &_ebo);
+	tinygltf::BufferView &bufferView { model.bufferViews[accessor.bufferView] };
+	tinygltf::Buffer &buffer { model.buffers[bufferView.buffer] };
+	GLenum target { bufferView.target > -1 ? static_cast<GLenum>(bufferView.target) : GL_ARRAY_BUFFER };
 
-	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-	glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(Vertex), &_vertices[0], GL_STATIC_DRAW);
+	glGenBuffers(1, &_normalVbo);
+	glBindBuffer(target, _normalVbo);
+	glBufferData(
+		target,
+		bufferView.byteLength,
+		buffer.data.data() + bufferView.byteOffset,
+		GL_STATIC_DRAW
+	);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(unsigned int), &_indices[0], GL_STATIC_DRAW);
-
-	// vertex positions
 	glVertexAttribPointer(
-		0,
+		VERTEX_ATTRIB_NORMAL,
 		3,
-		GL_FLOAT,
+		accessor.componentType,
 		GL_FALSE,
-		sizeof(Vertex),
-		nullptr
+		bufferView.byteStride,
+		(void*)(accessor.byteOffset)
 	);
-	glEnableVertexAttribArray(0);
-	// vertex normals
-    glVertexAttribPointer(
-		1,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(Vertex),
-		(void*)offsetof(Vertex, Normal)
-	);
-	glEnableVertexAttribArray(1);
-    // vertex texture coords
-    glVertexAttribPointer(
-		2,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof(Vertex),
-		(void*)offsetof(Vertex, TexCoords)
-	);
-	glEnableVertexAttribArray(2);
-
-	glBindVertexArray(0);
+	glEnableVertexAttribArray(VERTEX_ATTRIB_NORMAL);
 }
