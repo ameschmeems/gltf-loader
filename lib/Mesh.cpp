@@ -6,8 +6,9 @@
  * 
  * @param model Model loaded from tinygltf
  * @param mesh Mesh loaded from tinygltf
+ * @param transform Model matrix loaded from tinygltf
  */
-Mesh::Mesh(tinygltf::Model &model, tinygltf::Mesh &mesh)
+Mesh::Mesh(tinygltf::Model &model, tinygltf::Mesh &mesh, glm::mat4 transform) : _transform { transform }
 {
 	glGenVertexArrays(1, &_vao);
 	glBindVertexArray(_vao);
@@ -41,6 +42,7 @@ Mesh::Mesh(tinygltf::Model &model, tinygltf::Mesh &mesh)
 void Mesh::draw(Shader &shader)
 {
 	glBindVertexArray(_vao);
+	shader.setUniform(MODEL_MATRIX_UNIFORM, _transform);
 	glDrawElements(
 		GL_TRIANGLES,
 		_elementCount,

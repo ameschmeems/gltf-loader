@@ -1,7 +1,7 @@
 #include "Model.hpp"
 #include <iostream>
 #include <spdlog/spdlog.h>
-#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 /**
  * @brief Constructor for a model from a file. If default scene not specified, reads scene at index 0
@@ -59,20 +59,23 @@ void Model::_processScene(tinygltf::Model &model, size_t sceneIndex)
 
 	for (auto i : scene.nodes)
 	{
-		_processNode(model, model.nodes[i]);
+		_processNode(model, model.nodes[i], glm::mat4(1.0));
 	}
 }
 
-void Model::_processNode(tinygltf::Model &model, tinygltf::Node &node)
+void Model::_processNode(tinygltf::Model &model, tinygltf::Node &node, glm::mat4 matrix)
 {
+	glm::mat4 transform = node.matrix.size() == 0 ? glm::mat4(1.0) : glm::make_mat4(node.matrix.data());
+	transform *= matrix;
+
 	if (node.mesh > -1)
 	{
 		spdlog::debug("Processing Mesh: {}", node.mesh);
-		_meshes.push_back(Mesh { model, model.meshes[node.mesh] });
+		_meshes.push_back(Mesh { model, model.meshes[node.mesh], transform });
 	}
 
 	for (auto child : node.children)
 	{
-		_processNode(model, model.nodes[child]);
+		_processNode(model, model.nodes[child], transform);
 	}
 }

@@ -8,6 +8,7 @@
 #define VERTEX_ATTRIB_POSITION 0
 #define VERTEX_ATTRIB_NORMAL 1
 #define VERTEX_ATTRIB_TEX_COORD_0 2
+#define MODEL_MATRIX_UNIFORM "model"
 
 /**
  * @class Mesh Mesh.hpp "include/Mesh.hpp"
@@ -17,7 +18,7 @@ class Mesh
 {
 public:
 
-	Mesh(tinygltf::Model &model, tinygltf::Mesh &mesh);
+	Mesh(tinygltf::Model &model, tinygltf::Mesh &mesh, glm::mat4 transform);
 
 	void draw(Shader &shader);
 
@@ -29,8 +30,9 @@ private:
 	void _processNormals(tinygltf::Model &model, tinygltf::Accessor &accessor);
 
 	unsigned int _elementCount {};
-	unsigned int _elementOffset {};
+	unsigned long long _elementOffset {};
 	GLenum _elementComponentType {};
+	glm::mat4 _transform { 1.0f };
 
 	unsigned int _vao {};
 	unsigned int _positionVbo {};

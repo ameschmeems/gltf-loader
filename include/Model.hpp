@@ -1,6 +1,7 @@
 #pragma once
 #include <stdexcept>
 #include <tiny_gltf.h>
+#include <glm/glm.hpp>
 #include "Shader.hpp"
 #include "Mesh.hpp"
 
@@ -25,7 +26,7 @@ public:
 private:
 
 	void _processScene(tinygltf::Model &model, size_t sceneIndex);
-	void _processNode(tinygltf::Model &model, tinygltf::Node &node);
+	void _processNode(tinygltf::Model &model, tinygltf::Node &node, glm::mat4 matrix);
 
 	std::vector<Mesh> _meshes {};
 	std::string _directory {};
