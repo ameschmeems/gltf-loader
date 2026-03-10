@@ -1,8 +1,6 @@
 #pragma once
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 #include <stdexcept>
+#include <tiny_gltf.h>
 #include "Shader.hpp"
 #include "Mesh.hpp"
 
@@ -14,7 +12,7 @@ class Model
 {
 public:
 
-	Model(char *path);
+	Model(std::string &path);
 
 	void draw(Shader &shader);
 
@@ -26,10 +24,8 @@ public:
 
 private:
 
-	void _loadModel(std::string path);
-	void _processNode(aiNode *node, const aiScene *scene);
-	Mesh _processMesh(aiMesh *mesh, const aiScene *scene);
-	std::vector<Texture> _loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
+	void _processScene(tinygltf::Model &model, size_t sceneIndex);
+	void _processNode(tinygltf::Model &model, tinygltf::Node &node);
 
 	std::vector<Mesh> _meshes {};
 	std::string _directory {};

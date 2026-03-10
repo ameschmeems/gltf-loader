@@ -154,7 +154,7 @@ int main()
 		
 		Shader shader { "res/shaders/triangle.vert", "res/shaders/triangle.frag" };
 
-		Model model { "res/models/backpack/backpack.obj" };
+		Model model { std::string("res/models/Duck/Duck.gltf") };
 
 		while (!window.shouldClose())
 		{
@@ -193,32 +193,7 @@ int main()
 
 		return 0;
 	}
-	catch (Window::CreateWindowFailedException &e)
-	{
-		spdlog::critical("Exception thrown: {}", e.what());
-		exit(-1);
-	}
-	catch (Shader::VertexShaderCompilationException &e)
-	{
-		spdlog::critical("Exception thrown: {}", e.what());
-		exit(-1);
-	}
-	catch (Shader::FragmentShaderCompilationException &e)
-	{
-		spdlog::critical("Exception thrown: {}", e.what());
-		exit(-1);
-	}
-	catch (Shader::ShaderProgramLinkingException &e)
-	{
-		spdlog::critical("Exception thrown: {}", e.what());
-		exit(-1);
-	}
-	catch (Texture::TextureLoadingException &e)
-	{
-		spdlog::critical("Exception thrown: {}", e.what());
-		exit(-1);
-	}
-	catch (Model::ModelLoadingException &e)
+	catch (std::runtime_error &e)
 	{
 		spdlog::critical("Exception thrown: {}", e.what());
 		exit(-1);
